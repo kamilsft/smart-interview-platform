@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Interview Coach</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-cpp.min.js"></script>
+</head>
+<body>
+<div class="page-container">
+
+	<!-- TOP MENU -->
+	<div class="top-menu">
+		<div class="menu-list">
+		<ul>
+			<li>
+		</ul>
+		</div>
+	</div>
+
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+        <h1>📋 Interview Question</h1>
+        <form action="/interview/form" method="get">
+            <label for="profession">Choose Interview Type:</label> 
+            <select name="profession" id="profession">
+					<optgroup label="Technology / Software">
+						<option value="Java Developer"
+							th:selected="${profession == 'Java Developer'}">Java
+							Developer</option>
+						<option value="Frontend Developer"
+							th:selected="${profession == 'Frontend Developer'}">Frontend
+							Developer</option>
+						<option value="Backend Developer"
+							th:selected="${profession == 'Backend Developer'}">Backend
+							Developer</option>
+						<option value="Full Stack Developer"
+							th:selected="${profession == 'Full Stack Developer'}">Full
+							Stack Developer</option>
+						<option value="Software Engineer"
+							th:selected="${profession == 'Software Engineer'}">Software
+							Engineer</option>
+						<option value="DevOps Engineer"
+							th:selected="${profession == 'DevOps Engineer'}">DevOps
+							Engineer</option>
+						<option value="QA Tester"
+							th:selected="${profession == 'QA Tester'}">QA Tester</option>
+						<option value="Data Scientist"
+							th:selected="${profession == 'Data Scientist'}">Data
+							Scientist</option>
+						<option value="Machine Learning Engineer"
+							th:selected="${profession == 'Machine Learning Engineer'}">Machine
+							Learning Engineer</option>
+						<option value="Cloud Engineer"
+							th:selected="${profession == 'Cloud Engineer'}">Cloud
+							Engineer</option>
+						<option value="Cybersecurity Analyst"
+							th:selected="${profession == 'Cybersecurity Analyst'}">Cybersecurity
+							Analyst</option>
+					</optgroup>
+
+					<optgroup label="Business / Management">
+						<option value="Product Manager"
+							th:selected="${profession == 'Product Manager'}">Product
+							Manager</option>
+						<option value="Project Manager"
+							th:selected="${profession == 'Project Manager'}">Project
+							Manager</option>
+						<option value="Business Analyst"
+							th:selected="${profession == 'Business Analyst'}">Business
+							Analyst</option>
+						<option value="Operations Manager"
+							th:selected="${profession == 'Operations Manager'}">Operations
+							Manager</option>
+						<option value="Marketing Specialist"
+							th:selected="${profession == 'Marketing Specialist'}">Marketing
+							Specialist</option>
+						<option value="Human Resources Coordinator"
+							th:selected="${profession == 'Human Resources Coordinator'}">Human
+							Resources Coordinator</option>
+					</optgroup>
+
+					<optgroup label="Finance / Economics">
+						<option value="Financial Analyst"
+							th:selected="${profession == 'Financial Analyst'}">Financial
+							Analyst</option>
+						<option value="Investment Analyst"
+							th:selected="${profession == 'Investment Analyst'}">Investment
+							Analyst</option>
+						<option value="Accountant"
+							th:selected="${profession == 'Accountant'}">Accountant</option>
+						<option value="Risk Analyst"
+							th:selected="${profession == 'Risk Analyst'}">Risk
+							Analyst</option>
+						<option value="Financial Planner"
+							th:selected="${profession == 'Financial Planner'}">Financial
+							Planner</option>
+						<option value="Corporate Banker"
+							th:selected="${profession == 'Corporate Banker'}">Corporate
+							Banker</option>
+					</optgroup>
+
+					<optgroup label="Support / Education">
+						<option value="IT Trainer"
+							th:selected="${profession == 'IT Trainer'}">IT Trainer</option>
+						<option value="Technical Support Specialist"
+							th:selected="${profession == 'Technical Support Specialist'}">Technical
+							Support Specialist</option>
+						<option value="Instructional Designer"
+							th:selected="${profession == 'Instructional Designer'}">Instructional
+							Designer</option>
+						<option value="Career Coach"
+							th:selected="${profession == 'Career Coach'}">Career
+							Coach</option>
+					</optgroup>
+				</select>
+				<button type="submit">Start</button>
+        </form>
+
+        <div class="question-block">
+            <p th:text="${question}">[Question will appear here]</p>
+
+            <details class="sidebar-card">
+                <summary class="sidebar-summary">💡 Hint</summary>
+                <div><p th:text="${hint}">Hint will appear here...</p></div>
+            </details>
+
+            <details class="sidebar-card">
+                <summary class="sidebar-summary">🤖 Coach Tip</summary>
+                <div><p th:text="${tip}">Tip will appear here...</p></div>
+            </details>
+
+            <details class="sidebar-card">
+                <summary class="sidebar-summary">🔁 Similar Questions</summary>
+                <ul>
+                    <li th:text="${question}"></li>
+                    <li th:text="${question}"></li>
+                </ul>
+            </details>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+        <form action="/interview/submitOrRun" method="post">
+            <div class="editor-block">
+                <label for="answer">Your Answer:</label>
+                <textarea name="answer" id="answer" rows="6" th:text="${answer} ?: ''"></textarea>
+            </div>
+
+            <div th:if="${isCodingField}" class="code-panel">
+                <label for="language">Choose Language:</label>
+                <select name="language" id="language" th:value="${language}">
+                    <option value="java">Java</option>
+                    <option value="python3">Python 3</option>
+                    <option value="cpp17">C++ 17</option>
+                    <option value="javascript">JavaScript</option>
+                </select>
+
+                <label for="code">Your Code:</label>
+                <textarea name="code" id="code" rows="10" class="code-editor" placeholder="Paste your code here..." th:text="${code} ?: ''"></textarea>
+
+                <button type="submit" name="action" value="run">Run Code</button>
+            </div>
+
+            <input type="hidden" name="question" th:value="${question}">
+            <button type="submit" name="action" value="submit">Submit Answer</button>
+        </form>
+
+        <div th:if="${feedback}" class="feedback-block">
+            <h3>Feedback:</h3>
+            <div th:utext="${feedback}"></div>
+        </div>
+
+        <div th:if="${output}" class="output-box">
+            <h3>Output:</h3>
+            <pre th:text="${output}"></pre>
+        </div>
+
+        <div th:if="${code}" class="highlighted-code-block">
+            <h3>Your Code (Highlighted):</h3>
+            <pre><code th:class="'language-' + ${language}" th:text="${code}"></code></pre>
+        </div>
+    </div>
+</div>
+</body>
+</html>

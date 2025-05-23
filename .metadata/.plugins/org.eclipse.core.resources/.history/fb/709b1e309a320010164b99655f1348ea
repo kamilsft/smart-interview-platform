@@ -1,0 +1,16 @@
+.sidebar-card summary {
+    font-weight: bold;
+    color: #2a7ae2;
+    font-size: 16px;
+    cursor: pointer;
+    list-style: none; /* removes default arrow */
+}
+
+.sidebar-card[open] summary::after {
+    content: " ▲";
+}
+
+.sidebar-card:not([open]) summary::after {
+    content: " ▼";
+}
+

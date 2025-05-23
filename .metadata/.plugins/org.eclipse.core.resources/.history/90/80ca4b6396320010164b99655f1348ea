@@ -1,0 +1,93 @@
+package com.kamil.aiinterview.aiinterviewcoach.service;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class InterviewService {
+	
+	private final OpenRouterService openRouterService;
+	
+	public InterviewService(OpenRouterService openRouterService) {
+		this.openRouterService = openRouterService;
+	}
+	
+	public boolean isCodingProfession(String profession) {
+	    return profession.toLowerCase().matches(".*(developer|engineer|data|ml|qa|devops|cybersecurity|cloud|frontend|backend|full stack).*");
+	}
+	
+	public String getNextQuestion(String profession) {
+		boolean coding = isCodingProfession(profession);
+		String prompt = "Generate a realistic job interview question for a " + profession + ".";
+		if(coding) {
+			prompt += " Also include a coding question in the same field.";
+		}
+		String fullResponse = openRouterService.generateQuestion(prompt);
+
+		String cleaned = fullResponse
+	            .replaceFirst("(?i)^question[:\\-\\s]*", "")  
+	            .replaceFirst("(?i)^sure!?\\s*here'?s a (realistic )?job interview question for a " + profession.toLowerCase() + " [:\\-\\s]*", "")
+	            .replaceFirst("(?i)^job interview question[:\\-\\s]*", "")
+	            .replaceFirst("(?i)^interview question[:\\-\\s]*", "")
+	            .trim();
+
+	    return cleaned;
+	}
+	
+	public String getHint(String question, String profession) {
+		boolean coding = isCodingProfession(profession);
+		String hintPrompt = "You are a helpful interview coach.\n";
+		hintPrompt += "Based on the following interview question, generate a helpful hint that can guide the candidate:\n";
+		hintPrompt += "Question: " + question + "\n";
+		if(coding) {
+			hintPrompt += " Also include a technical or coding hint";
+		}
+		String hintFullResponse = openRouterService.generateQuestion(hintPrompt);
+		
+		return hintFullResponse.replaceFirst("(?i)^hint[:\\-\\s]*", "").trim();
+	}
+	
+	public String getCoachTip(String question, String profession) {
+		boolean coding = isCodingprofession(profession);
+		String tipPrompt = "You are helpful interview coach.\n";
+		tipPrompt += "Based on the following interview question, generate a general strategy that makes a good answer great for the candidate:\n";
+		tipPrompt += 
+	}
+	
+	public String submitAnswer(String question, String userAnswer, String code) {
+		String prompt = """
+		    You are a senior Java technical interviewer.
+
+		
+		    "%s"
+
+		    Your Answer:
+		    "%s"
+
+		    Evaluate the answer thoroughly. Include:
+		    - If the answer is correct
+		    - Any missing key details
+		    - Strengths and weaknesses
+		    - A better version of the answer
+
+		    Return only the evaluation and rewritten answer. Do not introduce yourself.
+		    %s
+		""".formatted(
+		    question,
+		    userAnswer,
+		    (code != null && !code.isBlank()) ? "Your Code:\n" + code : ""
+		);
+
+		String aiResponse = openRouterService.generateQuestion(prompt);
+
+		
+		 String formatted = aiResponse
+			        .replaceAll("(?i)```\\s*java", "<pre><code class='language-java'>")
+			        .replaceAll("(?i)```", "</code></pre>")
+			        .trim();
+
+			    return formatted;
+	}
+	
+
+
+}

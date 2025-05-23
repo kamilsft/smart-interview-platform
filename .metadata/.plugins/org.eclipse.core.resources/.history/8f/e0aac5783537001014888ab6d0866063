@@ -1,0 +1,101 @@
+package com.kamil.aiinterview.aiinterviewcoach.controller;
+
+import com.kamil.aiinterview.aiinterviewcoach.service.*;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+@Controller
+@RequestMapping("/interview")
+public class InterviewController {
+	
+	private final InterviewService interviewService;
+	private final JdoodleService jdoodleService;
+	
+	public InterviewController(InterviewService interviewService, JdoodleService jdoodleService) {
+		this.interviewService = interviewService;
+		this.jdoodleService = jdoodleService;
+	}
+	
+	@GetMapping("/start/{profession}")
+	public String startInterview(@PathVariable String profession) {
+		return "Interview for " + profession + " started!";
+	}
+	
+	@GetMapping("/question")
+	public String getNextQuestion(@RequestParam(defaultValue = "Java Developer") String profession) {
+		return interviewService.getNextQuestion(profession);
+	}
+	
+	@PostMapping("/answer")
+	public String submitAnswer(@RequestParam String question, @RequestParam String answer, @RequestParam(required = false) String code, Model model) {
+		String feedback = interviewService.submitAnswer(question, answer, code);
+		model.addAttribute("question", question);
+		model.addAttribute("answer", answer);
+		model.addAttribute("code", code);
+		model.addAttribute("feedback", feedback);
+		return "practice";
+	}
+	
+	@GetMapping("/form")
+	public String showForm(@RequestParam(defaultValue = "Java Developer") String profession, Model model) {
+		String question = interviewService.getNextQuestion(profession);
+		String hint = interviewService.getHint(question, profession);
+		String coachTip = interviewService.getCoachTip(question, profession);
+		model.addAttribute("question", question);
+		model.addAttribute("profession", profession);
+		model.addAttribute("hint", hint);
+		model.addAttribute("tip", coachTip);
+		
+	    boolean isCodingField = profession.toLowerCase().matches(".*(developer|engineer|scientist|analyst|qa|tester|it|cloud|devops).*");
+	    model.addAttribute("isCodingField", isCodingField);
+		return "practice";
+	}
+	
+	@PostMapping("/run")
+	public String runCode(@RequestParam String code, @RequestParam String language, Model model) {
+		String output = jdoodleService.runCode(code, language);
+		model.addAttribute("code", code);
+		model.addAttribute("language", language);
+		model.addAttribute("output", output);
+		return "practice";
+	}
+	
+	
+	@PostMapping("/submitOrRun")
+	public String submitOrRun(@RequestParam String question,
+	                          @RequestParam String answer,
+	                          @RequestParam(required = false) String code,
+	                          @RequestParam(required = false) String language,
+	                          @RequestParam String action,
+	                          Model model) {
+
+	    model.addAttribute("question", question);
+	    model.addAttribute("answer", answer);
+	    model.addAttribute("code", code);
+	    model.addAttribute("language", language);
+
+	    if ("submit".equals(action)) {
+	        String feedback = interviewService.submitAnswer(question, answer, code);
+	        model.addAttribute("feedback", feedback);
+	    } else if ("run".equals(action)) {
+	        String output = jdoodleService.runCode(code, language);
+	        model.addAttribute("output", output);
+	    }
+
+	    return "practice"; 
+	}
+	
+	@GetMapping("/practice")
+	public String showPracticePage(@RequestParam(required = false) String profession, Model model) {
+		if(profession != null) {
+			String question = interviewService.getNextQuestion(profession);
+	        model.addAttribute("question", question);
+	        model.addAttribute("profession", profession);
+	        model.addAttribute("isCodingField", interviewService.isCodingProfession(profession));
+	        model.addAttribute("hint", interviewService.getHint(question, profession));
+	        model.addAttribute("tip", interviewService.getCoachTip(question, profession));
+		}
+		return "practice";
+	}
+}

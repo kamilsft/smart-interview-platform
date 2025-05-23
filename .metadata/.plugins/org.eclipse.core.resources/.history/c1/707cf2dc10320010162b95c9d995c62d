@@ -1,0 +1,65 @@
+package com.kamil.aiinterview.aiinterviewcoach.service;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class InterviewService {
+	
+	private final OpenRouterService openRouterService;
+	
+	public InterviewService(OpenRouterService openRouterService) {
+		this.openRouterService = openRouterService;
+	}
+	
+	public String getNextQuestion(String profession) {
+		String prompt = "Generate a realistic job interview question for a " + profession + ", "
+				+ "if it is something with the IT field, also add a coding question, and if it is not an IT job, dont create a coding question";
+		String fullResponse = openRouterService.generateQuestion(prompt);
+
+		String cleaned = fullResponse
+	            .replaceFirst("(?i)^question[:\\-\\s]*", "")  
+	            .replaceFirst("(?i)^sure!?\\s*here'?s a (realistic )?job interview question for a[:\\-\\s]*" + profession.toLowerCase() + "[:\\-\\s]*", "")
+	            .replaceFirst("(?i)^interview question[:\\-\\s]*", "")
+	            .trim();
+
+	    return cleaned;
+	}
+	
+	public String submitAnswer(String question, String userAnswer, String code) {
+		String prompt = """
+		    You are a senior Java technical interviewer.
+
+		
+		    "%s"
+
+		    Your Answer:
+		    "%s"
+
+		    Evaluate the answer thoroughly. Include:
+		    - If the answer is correct
+		    - Any missing key details
+		    - Strengths and weaknesses
+		    - A better version of the answer
+
+		    Return only the evaluation and rewritten answer. Do not introduce yourself.
+		    %s
+		""".formatted(
+		    question,
+		    userAnswer,
+		    (code != null && !code.isBlank()) ? "Your Code:\n" + code : ""
+		);
+
+		String aiResponse = openRouterService.generateQuestion(prompt);
+
+		
+		 String formatted = aiResponse
+			        .replaceAll("(?i)```\\s*java", "<pre><code class='language-java'>")
+			        .replaceAll("(?i)```", "</code></pre>")
+			        .trim();
+
+			    return formatted;
+	}
+	
+
+
+}
